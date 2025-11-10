@@ -5,6 +5,7 @@ private:
 public:
     Finger(int);
     ~Finger();
+    int read();
 };
 
 Finger::Finger(int pin)
@@ -13,3 +14,7 @@ Finger::Finger(int pin)
 }
 
 Finger::~Finger() {}
+
+int Finger::read() {
+    return analogRead(this->pin);
+}
