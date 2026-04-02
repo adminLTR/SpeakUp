@@ -4,7 +4,7 @@
 #include "Finger.h"
 
 #define NUM_FINGERS 5
-// #define RIGHT_HAND // left sends data to right, right processes all data
+#define RIGHT_HAND // left sends data to right, right processes all data
 
 // IMPORTANT TO CHANGE THIS ADDRESS TO THE OTHER HAND'S MAC ADDRESS
 // uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -23,6 +23,10 @@ struct Hand
   float pitch;
   float roll;
   float yaw;
+
+  float x;
+  float y;
+  float z;
 };
 
 Hand hand;
@@ -50,6 +54,36 @@ void read_hand_data() {
   hand.ring = fingers[3]->read();
   hand.pinky = fingers[4]->read();
 }
+
+#ifdef RIGHT_HAND
+float* get_sign_frame() {
+  static float frame[22];
+  frame[0] = left_hand.thumb;
+  frame[1] = left_hand.index;
+  frame[2] = left_hand.middle;
+  frame[3] = left_hand.ring;
+  frame[4] = left_hand.pinky;
+  frame[5] = left_hand.pitch;
+  frame[6] = left_hand.roll;
+  frame[7] = left_hand.yaw;
+  frame[8] = left_hand.x;
+  frame[9] = left_hand.y;
+  frame[10] = left_hand.z;
+  frame[11] = hand.thumb;
+  frame[12] = hand.index;
+  frame[13] = hand.middle;
+  frame[14] = hand.ring;
+  frame[15] = hand.pinky;
+  frame[16] = hand.pitch;
+  frame[17] = hand.roll;
+  frame[18] = hand.yaw;
+  frame[19] = hand.x;
+  frame[20] = hand.y;
+  frame[21] = hand.z;
+
+  return frame;
+}
+#endif
 
 void setup(void) {
 
@@ -88,6 +122,8 @@ void loop() {
   
   #ifdef RIGHT_HAND
   // Process hand data from left hand
+  float* sign_frame = get_sign_frame();
+  // Use sign_frame for further processing
   #else
   // Send hand data to right hand
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &hand, sizeof(hand));
